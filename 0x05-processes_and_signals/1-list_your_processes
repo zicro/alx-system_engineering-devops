@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-# display list of process
-ps -auxf
