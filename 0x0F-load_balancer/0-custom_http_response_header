@@ -1,0 +1,34 @@
+nstalls Nginx with configurations
+
+NGINX_DEFAULT_CONF="/etc/nginx/sites-available/default"
+WEB_ROOT="/var/www/html"
+
+
+sudo apt-get update
+sudo apt-get install -y nginx
+
+mkdir -p "$WEB_ROOT"
+echo "Hello World" | sudo tee "$WEB_ROOT/index.html" > /dev/null
+echo "Ceci n'est pas une page" | sudo tee "$WEB_ROOT/404.html" > /dev/null
+
+cat <<EOL | sudo tee "$NGINX_DEFAULT_CONF" > /dev/null
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    add_header X-Served-By $HOSTNAME;
+    root $WEB_ROOT;
+    index index.html index.htm;
+
+    location /redirect_me {
+        return 301 https://info.cern.ch/;
+    }
+
+    error_page 404 /404.html;
+    location /404 {
+      root $WEB_ROOT;
+      internal;
+    }
+}
+EOL
+
+sudo service nginx restart

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# configure HAProxy to balance load between
+# two web servers with custom headers
+
+install_and_configure_haproxy() {
+	apt-get -y update
+	apt-get -y upgrade
+
+	apt-get -y install software-properties-common
+    add-apt-repository -y ppa:vbernat/haproxy-2.5
+    apt-get -y update
+
+	apt-get -y install haproxy
+
+	cp /etc/haproxy/haproxy.cfg{,.orig}
+
+	cat <<EOL >> /etc/haproxy/haproxy.cfg
+frontend haproxy_balancer
+    bind *:80
+    mode http
+    default_backend webservers
+
+backend webservers
+    balance roundrobin
+    server 390705-web-01 100.25.159.136:80 check
+    server 390705-web-02 204.236.241.14	:80 check
+EOL
+
+	service haproxy restart
+
+}
+
+install_and_configure_haproxy
