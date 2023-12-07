@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# information about the subdomain
+
+print_info() {
+    local full_subdomain="$1"
+    local sub="$2"
+
+    dig "$full_subdomain" | awk -v subdomain="$sub" -F" " '/ANSWER SECTION:/ { getline; print "The subdomain " subdomain " is a " $4 " record and points to " $5 }'
+}
+
+# Check for correct number of arguments
+if [ "$#" -eq 2 ]; then
+    print_info "$2.$1" "$2"
+else
+    for sub in www lb-01 web-01 web-02; do
+        print_info "${sub}.$1" "$sub"
+    done
+fi
